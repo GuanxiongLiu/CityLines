@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>CityLines</title>
+  <meta name="author" content="Shijian Li">
+  <link rel="stylesheet" href="assets/fontawesome/css/font-awesome.min.css">
+  <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+  <script src="https://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+  <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="L.Polyline.SnakeAnim.js"></script>
+  <script src="leaflet-ant-path.js"></script>
+  <script src="Ion.RangeSlider.js"></script>
+  <link href="assets/bootstrap.css" rel="stylesheet">
+  <link href="Ion.RangeSlider.css" rel="stylesheet">
+  <link href="assets/bootstrap-theme.css" rel="stylesheet">
+  <link href="assets/theme.css" rel="stylesheet">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <style>
+    body { 
+    	margin:0; 
+    	padding:0; 
+    	font-family: sans-serif;
+    }
+    #wrapper {
+        position: absolute;
+        width: 100%;
+        top:31px;
+        bottom:0;
+    }
+    #time {
+    	padding-top: 20px;
+    	text-align: center;
+    }
+    #hub {
+    	padding-top: 20px;
+    	text-align: center;
+    }
+    #path {
+    	padding-top: 20px;
+    	text-align: center;
+    }
+    .map { 
+        position: relative;
+        width:100%;
+        height:90%;
+    }
+    .map-container {
+    	padding-top: 20px;
+    	float: right;
+        width:70%;
+        height:100%;
+    }
+    #legend {
+    	width:100%;
+    	height: 10%;
+    }
+    #panel {
+        float:left;
+        width:30%;
+        height:100%;
+    }
+    #banner {
+    	background: gray;
+    	padding-top: 20px;
+    	padding-bottom: 10px;
+    	text-align: center;
+    }
+    #banner h1{
+    	font-size: 3em;
+    }
+    #button {
+    	text-align: center
+    }
+  </style>
+</head>
+<body>
+
+<nav id="mainNav" class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="#page-top">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <img src="https://www.wpi.edu/sites/default/files/inline-image/Offices/Marketing-Communications/WPI_Inst_Prim_FulClr_PREVIEW.png" id="logo" style="width:150px;height:45px;"/>
+                <ul class="nav navbar-nav navbar-right">
+                      <li>
+                        <a class="page-scroll" href="intro.html">Introduction</a>
+                    </li>
+                </ul>
+
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+</nav>
+
+<div id='wrapper'>
+<div id='panel'>
+	<div id='banner'><H1 style='color: white'>Parameters</H1></div>
+    <div id='time'>
+    <h4><b><strong>Time</strong></b></h4><br>
+    <input id="lol1" type="range" min="1" max="7" value="1" step="1" onchange="showTime(this.value)" />
+    <span id="display1">0am-5am</span><hr>
+    </div>
+    <div id='hub'>
+    <h4><b><strong>Hub Number</strong></b></h4><br>
+    <input id="lol2" type="range" min="1" max="10" value="1" step="1" onchange="showValue(this.value, this.id)" />
+    <span id="display2">1</span><hr>
+    </div>
+    <div id='path'>
+    <h4><b><strong>Path Number</strong></b></h4><br>
+    <input id="lol3" type="range" min="0" max="5" value="0" step="1" onchange="showValue(this.value, this.id)" />
+    <span id="display3">0</span><hr>
+    </div>
+    <div id='button'>
+    <button onclick="map()">Generate</button>
+    </div>
+</div>
+<div class='map-container'>
+<div id='map-leaflet' class='map'> </div>
+<div id='legend'></div>
+</div>
+</div>
+<script type="text/javascript">
+function showTime(newValue)
+{
+    if (newValue == "1"){
+        document.getElementById("display1").innerHTML="0am-5am";
+    } else if (newValue == "2"){
+        document.getElementById("display1").innerHTML="6am-8am";
+    } else if (newValue == "3"){
+        document.getElementById("display1").innerHTML="9am-11am";
+    } else if (newValue == "4"){
+        document.getElementById("display1").innerHTML="12pm-14pm";
+    } else if (newValue == "5"){
+        document.getElementById("display1").innerHTML="15pm-17pm";
+    } else if (newValue == "6"){
+        document.getElementById("display1").innerHTML="18pm-20pm";
+    } else {
+    	document.getElementById("display1").innerHTML="21pm-23pm";
+    }
+}
+function showValue(newValue, which)
+{
+    if (which == "lol2"){
+        document.getElementById("display2").innerHTML=newValue;
+    } else if (which == "lol3"){
+        document.getElementById("display3").innerHTML=newValue;
+    }
+}
+</script>
+<script>
+var time = new Date();
+// console.log(time.getHours() <= 18 && time.getHours() >= 6)
+L.mapbox.accessToken = 'pk.eyJ1IjoicmhhZGFtYW50aHlzMDQiLCJhIjoiY2l6NzhzaWM1MDAyODMzcG80cWtmM2dpYyJ9.6YwZBaNJIFNspvE6_P35aQ';
+if(time.getHours() <= 18 && time.getHours() >= 6){
+    var mapLeaflet = L.mapbox.map('map-leaflet', 'mapbox.light')
+                      .setView([22.5453673, 113.945617], 11);
+    var background = "#f8f8f8";
+    var textColor = "black";
+} else {
+    var mapLeaflet = L.mapbox.map('map-leaflet', 'mapbox.dark')
+                      .setView([22.5453673, 113.945617], 11);
+    var background = "#191919";
+    var textColor = "white";
+}
+
+var svg = d3.select('#legend').append("svg")
+							  .attr("width", 678)
+							  .attr("height", 70)
+							  .style("z-index",3);
+var canvas = document.getElementById("legend");
+
+canvas.style.background=background;
+svg.append("circle")
+   .attr("cx",100)
+   .attr("cy",20)
+   .attr("r",10)
+   .style("stroke", "red")
+   .style("stroke-width", 1.5)
+   .style("fill","red")
+   .style("fill-opacity",0.5)
+svg.append("text")
+   .attr("x",115)
+   .attr("y",25)
+   .style("fill",textColor)
+   .attr("font-family", "sans-serif")
+   .text("Hub");
+svg.append("circle")
+   .attr("cx",260)
+   .attr("cy",20)
+   .attr("r",10)
+   .style("stroke", "#88E188")
+   .style("stroke-width", 1.5)
+   .style("fill","#88E188")
+   .style("fill-opacity",0.5)
+svg.append("text")
+   .attr("x",275)
+   .attr("y",25)
+   .style("fill",textColor)
+   .attr("font-family", "sans-serif")
+   .text("Start/End");
+svg.append("rect")
+   .attr("x",460)
+   .attr("y",15)
+   .attr("width",50)
+   .attr("height",8)
+   .style("fill","red")
+   .style("fill-opacity",0.6);
+svg.append("rect")
+   .attr("x",440)
+   .attr("y",15)
+   .attr("rx", 3)
+   .attr("width",30)
+   .attr("height",8)
+   .style("fill","#ffb2b2");
+svg.append("rect")
+   .attr("x",500)
+   .attr("y",15)
+   .attr("rx", 3)
+   .attr("width",30)
+   .attr("height",8)
+   .style("fill","#ffb2b2");
+svg.append("text")
+   .attr("x",535)
+   .attr("y",25)
+   .style("fill",textColor)
+   .attr("font-family", "sans-serif")
+   .text("Path");
+
+function map(){
+    var t = document.getElementById("lol1").value;
+    var tt = document.getElementById("lol2").value;
+    var ttt = document.getElementById("lol3").value;
+    var combo = "H"+tt+"_"+"D"+ttt+"_"+"T"+t;
+for(i in mapLeaflet._layers) {
+        if(mapLeaflet._layers[i]._path != undefined || mapLeaflet._layers[i]._img != undefined) {
+            try {
+                mapLeaflet.removeLayer(mapLeaflet._layers[i]);
+            }
+            catch(e) {
+                console.log("problem with " + e + mapLeaflet._layers[i]);
+            }
+        }
+    }
+d3.json("https://lawdpls.github.io/project/data_stable.json", function(collection) {
+    console.log(collection[combo])
+    var hub,
+    line;
+    for (var item in collection) {
+        if (item == combo){
+            // console.log(collection[item]);
+            hub = collection[item].hub.result;
+            line = collection[item].direct.result;
+        }
+    }
+    // console.log(hub)
+    for (var i = 0; i<hub.length;i++){
+        var loc = [];
+        loc[0] = hub[i].loc_lat;
+        loc[1] = hub[i].loc_lng;
+        var popup = L.popup()
+            .setContent("n_pairs: "+hub[i].n_pairs+"<br>Volume: "+
+                Math.floor(hub[i].volume));
+        var cir = L.circleMarker(loc, {
+            color: 'red',
+            opacity: 0.5,
+            fillColor: 'red',
+            fillOpacity: 0.5
+            // className: 'circles',
+            // radius: 400
+        }).addTo(mapLeaflet);
+        cir.bindPopup(popup);
+        cir.on('mouseover', function(){
+            this.openPopup();
+        });
+        cir.on('mouseout', function (e) {
+            this.closePopup();
+        });
+    }
+
+    var num = line.length;
+    for (var k = 0; k<num; k++) {
+        var point = [];
+        var sp = L.popup()
+            .setContent("Start");
+        var lp = L.popup()
+            .setContent("End");
+        for (var i = 0; i<line[k].length;i++){
+            var temp = [line[k][i][1],line[k][i][0]];
+            point.push(temp)
+        }
+        var len = point.length,
+            first = [point[0][0], point[0][1]]
+            last = [point[len-1][0], point[len-1][1]];
+        var path = L.polyline.antPath(point,{
+        		snakingSpeed: 200,
+                color:'red',
+                weight: 5,
+                opacity: 0.5,
+                lineJoin:'round'
+        }).addTo(mapLeaflet);
+        // ant = L.polyline.antPath(f);
+        // ant.addTo(mapLeaflet);
+        var star = L.circleMarker(first, {
+            color: '#88E188',
+            opacity: 0.5,
+            fillColor: '#88E188',
+            fillOpacity: 0.5
+            // className: 'circles',
+            // radius: 400
+        }).addTo(mapLeaflet);
+        star.bindPopup(sp);
+        star.on('mouseover', function(){
+            this.openPopup();
+        });
+        star.on('mouseout', function (e) {
+            this.closePopup();
+        });
+        var end = L.circleMarker(last, {
+            color: '#98FB98',
+            opacity: 0.5,
+            fillColor: '#98FB98',
+            fillOpacity: 0.5
+            // className: 'circles',
+            // radius: 400
+        }).addTo(mapLeaflet);
+        end.bindPopup(lp);
+        end.on('mouseover', function(){
+            this.openPopup();
+        });
+        end.on('mouseout', function (e) {
+            this.closePopup();
+        });
+    }
+    // console.log(point)
+})
+// function cleanPath() {
+//     for(i in mapLeaflet._layers) {
+//         if(mapLeaflet._layers[i]._path != undefined) {
+//             try {
+//                 mapLeaflet.removeLayer(mapLeaflet._layers[i]);
+//             }
+//             catch(e) {
+//                 console.log("problem with " + e + mapLeaflet._layers[i]);
+//             }
+//         }
+//     }
+// }
+}
+mapLeaflet.scrollWheelZoom.disable();
+</script>
+</body>
+</html>

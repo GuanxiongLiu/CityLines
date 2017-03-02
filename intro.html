@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<link rel="stylesheet" href="assets/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link href="assets/bootstrap-theme.css" rel="stylesheet">
+  <link href="assets/theme.css" rel="stylesheet">
+
+</head>
+<body>
+
+<nav id="mainNav" class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll" href="./index.html">Home</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <img src="https://www.wpi.edu/sites/default/files/inline-image/Offices/Marketing-Communications/WPI_Inst_Prim_FulClr_PREVIEW.png" id="logo" style="width:150px;height:45px;"/>
+                <ul class="nav navbar-nav navbar-right">
+                      <li>
+                        <a class="page-scroll" href="#page-top">Introduction</a>
+                    </li>
+                </ul>
+
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+</nav>
+
+<div class="container">
+  <div class="jumbotron">
+    <h1>CityLines</h1>      
+    <p>A hybrid hub-and-spoke system for urban transportation</p>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Road Networks</div>
+    <div class="panel-body">In our study, we use the Google GeoCoding to retrieve the bounding box of Shenzhen. The bounding box is defined between $22.45^{\circ}$ to $22.70^{\circ}$ in latitude and $113.75^{\circ}$ to $114.30^{\circ}$ in longitude. The covered area is about $1,300km^{2}$.
+	</div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Trip Demands</div>
+    <div class="panel-body">Our trip demands data are extracted from large GPS trajectory dataset (from taxis) and AFC billing dataset (from buses and subway trains) collected from Shenzhen, China during March 2014.
+  </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="thumbnail">
+        <a href="./figure/heat_map1" target="_blank">
+          <img src="./figure/heat_map1" alt="Lights" style="width:100%; height: 200px">
+          <div class="caption">
+            <p><strong>Figure 1. Trip source locations</strong></p>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="thumbnail">
+        <a href="./figure/heat_map2" target="_blank">
+          <img src="./figure/heat_map2" alt="Lights" style="width:100%; height: 200px">
+          <div class="caption">
+            <p><strong>Figure 2. Trip destination locations</strong></p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">In Figure 1 and Figure 2, we visualized the distribution of source and destination locations of our trip demands. It clearly shows that most of source and destination locations are located at downtown and its sounding residential areas. This pattern fits our common sense of urban transportation which is dominated by daily commuting.
+  </div>
+  </div>
+</div>
+<div class="container">
+  <div class="panel panel-default">
+    <div class="panel-heading">Framework Overview</div>
+    <div class="panel-body">Figure 3 presents our optimal hybrid hub-and-spoke (OHHS) framework for CityLines system. It takes trip demand data and road map data as inputs. The whole framework consists of three stages in Figure 5: (1) map gridding, (2) trip demand aggregation, and (3) optimal hybrid hub-and-spoke (OHHS) planning.
+  </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="thumbnail">
+        <a href="./figure/framework" target="_blank">
+          <img src="./figure/framework" alt="Lights" style="width:100%; height: 400px">
+          <div class="caption">
+            <p><strong>Figure 3. CityLines framework</strong></p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Stage 1 Map gridding</div>
+    <div class="panel-body">The road map is divided into equal grids with a side-length of 0.01 degree in latitude and longitude. Then, a filtering process is conducted to eliminate those grids off the road network, so that the remaining $n$ grids are strongly connected by the road map, namely, each grid can reach any other grid through the road map. We refer to those remaining grids as spokes in the urban area. Then, we estimate average travel time between each spoke pair. Thus, an $n$ by $n$ travel time matrix $C$ is obtained, which contain the least travel time of each pair of spokes in the urban area.
+  </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Stage 2 Trip demand aggregation</div>
+    <div class="panel-body">In this stage, all sources and destinations of trip demands are aggregated to the spokes extracted in stage 1. Hence, a trip demand <$src, dst, t$> is aggregated as <$s, s' , t$>, where $s$ and $s'$ are the spokes where source $src$ and destination $dst$ are located at. Then, a spoke level trip demand matrix $V$ is obtained with each entry $V_{ij}$ representing the number of trip demands originating from spoke $i$ and terminating at spoke $j$.
+  </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">Stage 3 Optimal hybrid hub-and-spoke planning</div>
+    <div class="panel-body">Given a budget of $M$ point-to-point transit paths, and $L$ hub stations to deploy, we propose a two-step optimization framework to tackle the optimal hybrid hub-and-spoke (OHHS) planning problem, including an optimal hub selection (OHS) step and an optimal trip assignment (OTA) step. The OHS problem is formulated as a maximum coverage problem, that selects $M + L$ high quality hub candidates from $n$ spokes. The OTA problem is formulated as a p-HLP problem, which optimally assigns the trips to point-to-point transits or one hub to detour, with the goal of minimizing the average travel time per trip
+  </div>
+  </div>
+</div>
+</body>
+</html>
